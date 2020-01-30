@@ -1,7 +1,10 @@
+// Define the function to build the data from samples.json
 function buildMetaData(sample){
+
 // Function that builds the metadata panel usind d3
 d3.json("./samples.json").then(function(data){
-  // Use d3 to select the panel with id of `#sample-metadata`
+
+  // Use d3 to select the panel with id of `#sample-metadata` and default first id
       var sample_metadata = d3.select("#sample-metadata");
       var metadata = data.metadata;
       var result = metadata.filter(sampleobj => sampleobj.id==sample)[0]
@@ -18,6 +21,8 @@ d3.json("./samples.json").then(function(data){
       })
     });
 }
+
+// Define the function to build the charts
 function buildCharts(sample) {
   
   // Fetch the sample data for the plots
@@ -25,12 +30,12 @@ function buildCharts(sample) {
     var samples = data.samples;
     var result = samples.filter(sampleobj => sampleobj.id==sample)[0]
 
-  // Build a Bubble Chart using the sample data
+  // Build the BUBBLE plot
       var xValues = result.otu_ids;
       var yValues = result.sample_values;
       var mSize = result.sample_values;
       var mClrs = result.otu_ids;
-      var tValues = result.otu_labels;
+      var tValues = result.otu_values;
       
       var trace_bubble = {
         x: xValues,
@@ -50,22 +55,44 @@ function buildCharts(sample) {
   
       Plotly.newPlot('bubble', data, layout)
 
-      var pieValue = result.sample_values.slice(0, 10);
-        var pielabel = result.otu_ids.slice(0, 10);
-        var pieHover = result.otu_labels.slice(0, 10);
-  
-        var data = [{
-          values: pieValue,
-          labels: pielabel,
-          hovertext: pieHover,
-          type: 'pie'
-        }];
-  
-        Plotly.newPlot('pie', data);
-    });
+// Build the BAR plot
+  var barValue = result.sample_values.slice(0, 10);
+  var xValues = result.otu_values;
+  var barLabel = result.otu_ids
+
+  // create trace variable for the plot
+  var trace = {
+    x: barValue,
+    y: xValues,
+    labels: barLabel,
+    mode: 'markers',
+    type:"bar",
+    orientation: "h",
 };
 
+// Create data variable and display
+  var data = [trace];
+  var layout = {title: "Top 10 OTUs"}
 
+  Plotly.newPlot("bar", data, layout)
+
+// Build the PIE plot
+var pieValue = result.sample_values.slice(0, 10);
+var pielabel = result.otu_ids.slice(0, 10);
+var pieHover = result.otu_labels.slice(0, 10);
+
+var data = [{
+  values: pieValue,
+  labels: pielabel,
+  hovertext: pieHover,
+  type: 'pie'
+}];
+
+Plotly.newPlot('pie', data);
+  });
+}
+
+// Define the function to initialize the data
 function init(){
   d3.json("./samples.json").then(function(data){
     var selector = d3.select("#selDataset");
@@ -75,18 +102,13 @@ function init(){
     })
     buildMetaData(sampleNames[0])
     buildCharts(sampleNames[0])
-
   });
-
 }
 
 init();
     
- 
-// Call updatePlotly() when a change takes place to the DOM
+// Define the function when a new ID is se
 d3.selectAll("#selDataset").on("change", updatePlotly);
-
-// This function is called when a dropdown menu item is selected
 function updatePlotly() {
 
   // Use D3 to select the dropdown menu
@@ -98,4 +120,3 @@ function updatePlotly() {
   buildMetaData(dataset)
   buildCharts(dataset)
 };
-
