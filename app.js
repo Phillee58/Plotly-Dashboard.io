@@ -56,19 +56,23 @@ function buildCharts(sample) {
       Plotly.newPlot('bubble', data, layout)
 
 // Build the BAR plot
-  var barValue = result.sample_values.slice(0, 10);
-  var xValues = result.otu_values;
-  var barLabel = result.otu_ids
+var barValue = result.sample_values;
+var xValues = result.otu_values;
+var barLabel = result.otu_ids; // NOT WORKING
+var barHover = result.otu_labels;
 
-  // create trace variable for the plot
+// create trace variable for the plot
   var trace = {
-    x: barValue,
+    x: barValue.slice(0, 10).reverse(),
     y: xValues,
-    labels: barLabel,
+    labels: barLabel.slice(0, 10).reverse(),  // NOT WORKING
+    hovertext: barHover,
     mode: 'markers',
     type:"bar",
     orientation: "h",
 };
+
+console.log(bar)
 
 // Create data variable and display
   var data = [trace];
@@ -78,12 +82,12 @@ function buildCharts(sample) {
 
 // Build the PIE plot
 var pieValue = result.sample_values.slice(0, 10);
-var pielabel = result.otu_ids.slice(0, 10);
+var pieLabel = result.otu_ids.slice(0, 10);
 var pieHover = result.otu_labels.slice(0, 10);
 
 var data = [{
   values: pieValue,
-  labels: pielabel,
+  labels: pieLabel,
   hovertext: pieHover,
   type: 'pie'
 }];
